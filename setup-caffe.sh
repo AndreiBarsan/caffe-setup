@@ -212,7 +212,10 @@ printf "\n\t%s\n" "Dependencies set up OK. Building Caffe itself."
 printf "\n\t%s\n" "This will take a while."
 
 # TODO(andrei): Do we need custom Makefile tricks to support cuDNN?
+# Nevermind, it seems that cuDNN 6, which is required for modern Caffe, is not
+# available on Euryale.
 
+# TODO(andrei): Check if Caffe is installed and complain.
 cd "${WORKDIR}"
 
 if ! [[ -d 'caffe' ]]; then
