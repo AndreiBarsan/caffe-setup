@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Experimental script to install Caffe in a users's HOME directory. 
+# Experimental script to install Caffe in a users's HOME directory.
 # Tailored specifically towards Euryale, so assumes *some* basic dependencies,
 # such as CUDA and cudnn are available as modules.
 #
@@ -48,7 +48,7 @@ WORKDIR=~/work
 echo "Will be using ${WORKDIR} as a work directory for fetching and building libraries."
 
 mkdir -p "$WORKDIR"
-# TODO(andrei): Support installing crap in some subfolder of home, such as 
+# TODO(andrei): Support installing crap in some subfolder of home, such as
 # ~/foo/{bin,lib,include,man,...}.
 # Make sure this 'bin' is on your PATH, and 'lib' on your LD_LIBRARY_PATH.
 mkdir -p ~/bin
@@ -67,7 +67,7 @@ cd ~/work
 
 # ATLAS_FNAME="atlas3.10.0.tar.bz2"
 # LAPACK_FNAME="lapack-3.4.2.tgz"
-# 
+#
 # if ! [[ -f "$LAPACK_FNAME" ]]; then
 #   echo "Downloading lapack: ${LAPACK_FNAME}..."
 #  wget -O "$LAPACK_FNAME" http://www.netlib.org/lapack/lapack-3.4.2.tgz
@@ -86,11 +86,11 @@ cd ~/work
 #  tar jxvf "$ATLAS_FNAME" 1>/dev/null || fail "Could not unpack ATLAS."
 #fi
 
-# cd ATLAS 
+# cd ATLAS
 # rm -rf build_obj && mkdir -p build_obj && cd build_obj
 
 #run ../configure -b 64 -Fa alg -fPIC --shared --prefix=$(pwd) --with-netlib-lapack-tarfile=../../${LAPACK_FNAME} || fail "Could not configure ATLAS."
-#run make -j8 	    || fail "Could not build ATLAS."
+#run make -j8	    || fail "Could not build ATLAS."
 #run make check -j8  || fail "ATLAS tests failed."
 #run make time       || fail "ATLAS 'make time' failed."
 #run make install    || fail "Could not install ATLAS."
@@ -106,7 +106,7 @@ if ! [[ -f "${HOME}/bin/protoc" ]]; then
     git clone https://github.com/google/protobuf.git
   fi
 
-  cd protobuf/                                                     
+  cd protobuf/
   run ./autogen.sh                        || fail "protobuf autogen failed"
   run ./configure --prefix="${HOME}"      || fail "protobuf configure failed"
   run make -j4                            || fail "protobuf make failed"
@@ -144,9 +144,9 @@ fi
 if ! [[ -f "${HOME}/lib/libleveldb.so" ]]; then
   cd ${WORKDIR}
   if ! [[ -d leveldb ]]; then
-    git clone https://github.com/google/leveldb.git                  
+    git clone https://github.com/google/leveldb.git
   fi
-  cd leveldb/                                                      
+  cd leveldb/
   make
   cp --preserve=links out-static/libleveldb.* ${HOME}/lib
   cp --preserve=links out-shared/libleveldb.* ${HOME}/lib
@@ -165,8 +165,8 @@ if ! [[ -f "${HOME}/lib/libsnappy.so" ]]; then
   if ! [[ -d snappy ]]; then
     git clone https://github.com/google/snappy.git
   fi
-  cd snappy/                                                       
-  ./autogen.sh                                                     
+  cd snappy/
+  ./autogen.sh
   ./configure --prefix=${HOME}
   run make          || fail "Could not build Snappy."
   # This WILL fail with some bullshit reason about not being to install the
