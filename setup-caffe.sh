@@ -35,10 +35,17 @@ echo "Setting up Caffe for the local user (experimental support)..."
 # Load appropriate modules.
 # If executing remotely, make sure you source the appropriate system-level configs
 # in order to expose the 'module' command.
-module load cuda           || fail 'Could not load CUDA module.'
-module load cudnn/v5.1     || fail 'Could not load CUDNN module (v5.1).'
-module load opencv/2.4.12  || fail 'Could not load OpenCV module (v2.4.12).'
-module load boost/1.60.0   || fail 'Could not load boost module (v1.60.0).'
+
+CUDA_VERSION="7.5.18"
+
+# 'x64' == hack for CUDA 7.5's path being inconsistent.
+MODULE_CUDA_DIR="/site/opt/cuda/${CUDA_VERSION}/x64"
+module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
+module load cudnn/v5.1              || fail 'Could not load CUDNN module (v5.1).'
+module load opencv/2.4.12           || fail 'Could not load OpenCV module (v2.4.12).'
+# Fun fact: Boost 1.60 had a bug preventing it from being used to compile Caffe.
+module load boost/1.62.0            || fail 'Could not load boost module (v1.62.0).'
+module load mpich                   || fail 'Could not load mpi module.'
 
 echo "Relevant modules loaded OK."
 
@@ -138,7 +145,7 @@ fi
 
 
 ################################################################################
-# Setup leveldb
+# Setup LevelDB
 ################################################################################
 
 if ! [[ -f "${HOME}/lib/libleveldb.so" ]]; then
@@ -148,9 +155,9 @@ if ! [[ -f "${HOME}/lib/libleveldb.so" ]]; then
   fi
   cd leveldb/
   make
-  cp --preserve=links out-static/libleveldb.* ${HOME}/lib
-  cp --preserve=links out-shared/libleveldb.* ${HOME}/lib
-  cp -r include/leveldb ${HOME}/include
+  cp --preserve=links out-static/libleveldb.* "${HOME}/lib"
+  cp --preserve=links out-shared/libleveldb.* "${HOME}/lib"
+  cp -r include/leveldb "${HOME}/include"
 else
   echo "Found local leveldb installation. Not installing leveldb."
 fi
@@ -188,32 +195,50 @@ if ! [[ -f "${HOME}/bin/mdb_copy" ]]; then
   fi
 
   cd mdb/libraries/liblmdb
+  # Ensures the right prefix is used. You know, because configuring shit using
+  # commandline arguments is for suckers, RIGHT?
   # Yep, the quirky quoting is necessary.
-  # TODO(andrei): Use $HOME.
   sed -i 's|prefix\s*=\s*/usr/local|prefix = '"${HOME}"'|g' Makefile || fail "Sed fail"
-  # vi Makefile # change prefix to /home/you/usr
   make            || fail "Could not build mdb."
   make install    || fail "Could not install mdb."
 fi
 
 
 ################################################################################
-# Setup Caffe
+# Setup Caffe itself
 ################################################################################
 
-echo "\n\t Dependencies set up OK. Installing Caffe itself."
+printf "\n\t%s\n" "Dependencies set up OK. Building Caffe itself."
+printf "\n\t%s\n" "This will take a while."
 
-# TODO(andrei): Do we need custom Makefile tricks to support cudNN?
+# TODO(andrei): Do we need custom Makefile tricks to support cuDNN?
 
 cd "${WORKDIR}"
+
+if ! [[ -d 'caffe' ]]; then
   git clone https://github.com/BVLC/caffe.git
   cd caffe
+fi
+
+  cd caffe
   cp Makefile.config.example Makefile.config
-  # TODO(andrei): Uncomment if the local ATLAS installation is necessary.
-  # sed -i 's|BLAS_LIB := .*|BLAS_LIB := '""'|g' Makefile || fail "Could not update Makefile configuration."
-  #sed '/^INCLUDE_DIRS:/ s/$/ /usr/local/include|' file
+# TODO(andrei): Uncomment if the local ATLAS installation is necessary.
+  # sed -i 's|#?\s*BLAS_LIB\s*:=\s*/.*|BLAS_LIB := '"${HOME}/local/atlas/path/here"'|g' Makefile.config || fail "Could not update Makefile configuration."
 
+  # Ensure Caffe knows about our locally installed components.
+  sed -i '/^INCLUDE_DIRS\s*:=/ s|$| '"${HOME}"'/include|g' Makefile.config
+  sed -i '/^LIBRARY_DIRS\s*:=/ s|$| '"${HOME}"'/lib|g' Makefile.config
 
+  # Ensure Caffe uses the right CUDA installation.
+  # TODO(andrei): Mini-benchmark info with and without cudnn.
+  sed -i 's|^CUDA_DIR\s*:=\s.*|CUDA_DIR := '"${MODULE_CUDA_DIR}"'|' Makefile.config
 
+  # TODO(andrei): Remove arch 60, 61 lines if using CUDA 7.5.
 
-echo "Done."
+  run make all        || fail "Could not build caffe."
+  # TODO(andrei): Do we need to run these on a GPU?
+  run make test       || fail "Could not build caffe tests."
+  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${MODULE_CUDA_DIR}/x64/lib64"
+  run make runtest    || fail "Caffe tests failed!"
+
+printf "\n\t%s\n" "Finished installing Caffe!"
