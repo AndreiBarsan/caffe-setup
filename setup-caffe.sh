@@ -118,6 +118,9 @@ if ! [[ -f "${HOME}/bin/protoc" ]]; then
   run ./configure --prefix="${HOME}"      || fail "protobuf configure failed"
   run make -j4                            || fail "protobuf make failed"
   run make install                        || fail "protobuf install failed"
+
+  # TODO(andrei): May need to also adjust the C++ include path for this to work
+  # properly when building Caffe.
 else
   echo "Found ~/bin/protoc. Not installing protobuf."
 fi
