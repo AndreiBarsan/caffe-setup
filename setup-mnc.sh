@@ -52,7 +52,8 @@ CUDA_VERSION="8.0.44"
 MODULE_CUDA_DIR="/site/opt/cuda/${CUDA_VERSION}/x64"
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
 #module load cudnn/v5.1              || fail 'Could not load CUDNN module (v5.1).'
-module load opencv/2.4.12           || fail 'Could not load OpenCV module (v2.4.12).'
+#module load opencv/2.4.12           || fail 'Could not load OpenCV module (v2.4.12).'
+module load opencv/3.1.0            || fail 'Could not load OpenCV module (v3.1.0)'
 # Fun fact: Boost 1.60 had a bug preventing it from being used to compile Caffe.
 module load boost/1.62.0            || fail 'Could not load boost module (v1.62.0).'
 module load mpich                   || fail 'Could not load mpi module.'
@@ -106,7 +107,9 @@ run conda install -y --quiet Cython numpy scipy scikit-image matplotlib h5py \
   leveldb networkx nose pandas protobuf python-gflags Pillow six \
   python-dateutil pyyaml hdf5 h5py
 # Little guys not available via Conda.
-yes | pip install  easydict opencv-python
+yes | pip install easydict opencv-python
+
+# Note: Caffe compilation is after this giant commented-out block!
 
 ################################################################################
 # Setup ATLAS with LAPACK
@@ -145,8 +148,9 @@ yes | pip install  easydict opencv-python
 #run make time       || fail "ATLAS 'make time' failed."
 #run make install    || fail "Could not install ATLAS."
 
-
-# TODO(andrei): Do we need to install protobuf manually if we have conda?
+# Note: the next dependencies which are commented-out may still be necessary if
+# you get errors when installing them with conda. Doing the "manual" install
+# can solve many problems.
 
 ################################################################################
 # Setup Protobuf
@@ -301,6 +305,8 @@ sed -i 's|^CUDA_DIR\s*:=\s.*|CUDA_DIR := '"${MODULE_CUDA_DIR}"'|' Makefile.confi
 printf "\n\t%s\n\n" "Starting main Caffe build."
 
 #export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${MODULE_CUDA_DIR}/x64/lib64"
+# Mini hack to get OpenCV work even though it expects CUDA 7.5.
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/site/opt/cuda/7.5.18/x64/lib64"
 run_gpu make all -j8      || fail "Could not build caffe."
 run_gpu make pycaffe -j8  || fail "Could not build pycaffe."
 run_gpu make test -j8     || fail "Could not build caffe tests."
@@ -308,13 +314,14 @@ run_gpu make test -j8     || fail "Could not build caffe tests."
 # very usueful in figuring out if there's something that's misconfigured.
 run_gpu make runtest -j4  || fail "Caffe tests failed."
 
-printf "\n\t%s\n\nBuild OK. Fetching trained MNC model..."
-cd ${WORKDIR}/MNC
-./data/scripts/fetch_mnc_model.sh || fail "Could not download pretrained model."
+printf "\n\t%s\n\nBuild OK."
 
-printf "\n\t%s\n\n"
+printf "\n\t%s\n\nFetching trained MNC model..."
+if ! [[ -f "./data/mnc_model.caffemodel.h5" ]]; then
+  cd ${WORKDIR}/MNC
+  ./data/scripts/fetch_mnc_model.sh || fail "Could not download pretrained model."
+else
+  echo "Model was already downloaded."
+fi
 
-
-# TODO(andrei): Any final steps?
-
-printf "\n\t%s\n" "Finished installing Caffe!"
+printf "\n\t%s\n" "Finished setting up the Multi-Task Network Cascate (MNC) project (with its custom Caffe)!"
