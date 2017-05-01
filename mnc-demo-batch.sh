@@ -40,10 +40,12 @@ echo "** working directory = "$SLURM_SUBMIT_DIR
 echo
 echo "Setting up modules and miniconda..."
 
+# TODO(andrei): Common config with CUDA/cuDNN/openCV versions.
 CUDA_VERSION="8.0.44"
 WORKDIR=~/work
 
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
+module load cudnn/v4                || fail 'Could not load CUDNN module (v4).'
 module load opencv/3.1.0            || fail 'Could not load OpenCV module (v3.1.0)'
 module load boost/1.62.0            || fail 'Could not load boost module (v1.62.0).'
 module load mpich                   || fail 'Could not load mpi module.'

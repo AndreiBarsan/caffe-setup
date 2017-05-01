@@ -51,7 +51,9 @@ CUDA_VERSION="8.0.44"
 
 MODULE_CUDA_DIR="/site/opt/cuda/${CUDA_VERSION}/x64"
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
-#module load cudnn/v5.1              || fail 'Could not load CUDNN module (v5.1).'
+# As of May 2017, Caffe (or at least the version used with MTN) does NOT
+# support cuDNN 5 or higher.
+module load cudnn/v4                || fail 'Could not load CUDNN module (v4).'
 #module load opencv/2.4.12           || fail 'Could not load OpenCV module (v2.4.12).'
 module load opencv/3.1.0            || fail 'Could not load OpenCV module (v3.1.0)'
 # Fun fact: Boost 1.60 had a bug preventing it from being used to compile Caffe.
@@ -79,6 +81,7 @@ mkdir -p ~/man
 # Miniconda and related packages
 ################################################################################
 
+# TODO(andrei): Install in scratch folder and create symlink in HOME.
 if ! [[ -d "${HOME}/miniconda" ]]; then
   echo "Setting up miniconda..."
   cd "$(mktemp -d)"
