@@ -67,7 +67,7 @@ cd ${WORKDIR}/MNC
 
 dt="`date '+%s'`"
 # This is where the magic happens.
-srun tools/demo.py 2>&1
+srun tools/demo.py "$@" 2>&1
 stat="$?"
 dt=$(( `date '+%s'` - ${dt} ))
 echo "Job finished. Status=$stat, duration=$dt second(s)."
