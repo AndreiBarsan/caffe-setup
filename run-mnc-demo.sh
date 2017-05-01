@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Utility for running the MNC demo on ETHZ's Euryale mini-cluster.
-# Useful as a sanity check.
+# Useful as a sanity check, after installing everything using 'setup-mnc.sh'.
+
+function fail {
+  LAST_ERR="$?"
+  echo >&2 "Failed to set up Caffe: $1"
+  exit $LAST_ERR
+}
 
 function run_gpu {
   srun -N 1 --gres=gpu:1 "$@"

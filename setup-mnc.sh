@@ -266,15 +266,9 @@ fi
 printf "\n\t%s\n" "Dependencies set up OK. Building MNC+Caffe itself."
 printf "\t%s\n\n" "This will take a while."
 
-# TODO(andrei): Do we need custom Makefile tricks to support cuDNN?
-# Nevermind, it seems that cuDNN 6, which is required for modern Caffe, is not
-# available on Euryale.
-
-# TODO(andrei): Check if Caffe is installed and complain.
 cd "${WORKDIR}"
-
 if ! [[ -d 'MNC' ]]; then
-  git clone --recursive https://github.com/daijifeng001/MNC
+  git clone --recursive https://github.com/AndreiBarsan/MNC
 fi
 
 cd MNC/lib && make || fail "Could not make Cython modules for the MNC project."
@@ -304,8 +298,8 @@ sed -i 's|^CUDA_DIR\s*:=\s.*|CUDA_DIR := '"${MODULE_CUDA_DIR}"'|' Makefile.confi
 
 printf "\n\t%s\n\n" "Starting main Caffe build."
 
-#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${MODULE_CUDA_DIR}/x64/lib64"
-# Mini hack to get OpenCV work even though it expects CUDA 7.5.
+# Mini hack to get OpenCV work even though it expects CUDA 7.5. Caffe itself
+# will use CUDA 8, but OpenCV won't complain either.
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/site/opt/cuda/7.5.18/x64/lib64"
 run_gpu make all -j8      || fail "Could not build caffe."
 run_gpu make pycaffe -j8  || fail "Could not build pycaffe."
