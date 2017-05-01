@@ -55,6 +55,10 @@ fi
 
 source activate mnc
 
+# Mini hack to get OpenCV work even though it expects CUDA 7.5. Caffe itself
+# will use CUDA 8, but OpenCV won't complain either.
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/site/opt/cuda/7.5.18/x64/lib64"
+
 echo "Setup OK. srun-ing MNC demo..."
 
 cd ${WORKDIR}/MNC
