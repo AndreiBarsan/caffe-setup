@@ -12,6 +12,7 @@ function fail {
 
 MNC_EURYALE_PATH="work/MNC"
 EURYALE_HOST="euryale"
+#EURYALE_HOST="en02"
 
 EUR_PROJECT_DIR="/import/euryale/projects/BARSANA.MSC.PROJECT"
 REMOTE_KITTI_DIR="${EUR_PROJECT_DIR}/kitti/"
