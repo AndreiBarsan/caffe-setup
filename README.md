@@ -22,11 +22,13 @@ understand the purpose of these scripts.
      of CUDA, cuDNN, boost, etc.
   1. If the above conditions are met (or once you tweaked the scripts
      accordingly), the first thing you will need to do is install Caffe (duh!).
-     This is done by running './setup-mnc.sh' on the remote host. This script
+     This is done by running `./setup-mnc.sh` on the remote host. This script
      will load the appropriate modules and set up miniconda for the Python
-     stuff. It will then build Caffe, pycaffe, and run its tests. It will also
+     stuff, as well as some of the other dependencies (miniconda manages more
+     than jus Python packages!).
+     It will then build Caffe, pycaffe, and run its tests. It will also
      download the MNC's pretrained weights provided by its authors.
-  1. You can then use 'run-mnc-demo.sh' to run the demo provided by the
+  1. You can then use `run-mnc-demo.sh` to run the demo provided by the
      authors. You should either run that script from the `MNC` project root, or
      provide the `--input` and `--output` flags explicitly.
   1. (Bonus) You can use `run-mnc-demo-batch.sh` to run the demo as a batch job
