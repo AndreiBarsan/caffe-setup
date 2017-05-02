@@ -33,4 +33,4 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/site/opt/cuda/7.5.18/x64/lib64"
 echo "Setup OK. srun-ing MNC demo..."
 
 cd ${WORKDIR}/MNC
-run_gpu tools/demo.py
+run_gpu tools/demo.py "$@"
