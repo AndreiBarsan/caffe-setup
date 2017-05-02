@@ -18,12 +18,10 @@ function fail {
   exit $LAST_ERR
 }
 
-# Uses a proper machine and not the login node to build stuff.
+# Uses a proper machine and not the login node to run stuff.
 # If SLURM is not present, simply replace the 'srun -N 1' part with 'eval'.
 function run {
   srun -N 1 "$@"
-  # TODO(andrei): Test everything with slurm once there's a free machine.
-  #eval "$@"
 }
 
 function run_gpu {
@@ -307,13 +305,13 @@ run_gpu make pycaffe -j8  || fail "Could not build pycaffe."
 run_gpu make test -j8     || fail "Could not build caffe tests."
 # Feel free to disable the tests if you're in a hurry, but they can still be
 # very usueful in figuring out if there's something that's misconfigured.
-run_gpu make runtest -j4  || fail "Caffe tests failed."
+#run_gpu make runtest -j4  || fail "Caffe tests failed."
 
 printf "\n\t%s\n\nBuild OK."
 
 printf "\n\t%s\n\nFetching trained MNC model..."
-if ! [[ -f "./data/mnc_model.caffemodel.h5" ]]; then
-  cd ${WORKDIR}/MNC
+cd ${WORKDIR}/MNC
+if ! [[ -f "./data/mnc_model/mnc_model.caffemodel.h5" ]]; then
   ./data/scripts/fetch_mnc_model.sh || fail "Could not download pretrained model."
 else
   echo "Model was already downloaded."
