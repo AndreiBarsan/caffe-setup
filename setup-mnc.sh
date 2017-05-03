@@ -18,12 +18,10 @@ function fail {
   exit $LAST_ERR
 }
 
-# Uses a proper machine and not the login node to build stuff.
+# Uses a proper machine and not the login node to run stuff.
 # If SLURM is not present, simply replace the 'srun -N 1' part with 'eval'.
 function run {
   srun -N 1 "$@"
-  # TODO(andrei): Test everything with slurm once there's a free machine.
-  #eval "$@"
 }
 
 function run_gpu {
@@ -52,9 +50,8 @@ CUDA_VERSION="8.0.44"
 MODULE_CUDA_DIR="/site/opt/cuda/${CUDA_VERSION}/x64"
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
 # As of May 2017, Caffe (or at least the version used with MTN) does NOT
-# support cuDNN 5 or higher.
-module load cudnn/v4                || fail 'Could not load CUDNN module (v4).'
-#module load opencv/2.4.12           || fail 'Could not load OpenCV module (v2.4.12).'
+# support cuDNN 5 or higher, and cuDNN 4 leads to errors, so it's disabled.
+#module load cudnn/v5.1              || fail 'Could not load cuDNN module.'
 module load opencv/3.1.0            || fail 'Could not load OpenCV module (v3.1.0)'
 # Fun fact: Boost 1.60 had a bug preventing it from being used to compile Caffe.
 module load boost/1.62.0            || fail 'Could not load boost module (v1.62.0).'
@@ -295,7 +292,6 @@ export LD_LIBRARY_PATH="${HOME}/miniconda/envs/mnc/lib:${LD_LIBRARY_PATH}"
 # Ensure Caffe uses the right CUDA installation.
 sed -i 's|^CUDA_DIR\s*:=\s.*|CUDA_DIR := '"${MODULE_CUDA_DIR}"'|' Makefile.config
 
-# TODO(andrei): Remove arch 20 and 21 since they're ancient anyway.
 # TODO(andrei): Remove arch 60, 61 lines if using CUDA 7.5, and if actually
 # present in the file.
 
@@ -309,13 +305,13 @@ run_gpu make pycaffe -j8  || fail "Could not build pycaffe."
 run_gpu make test -j8     || fail "Could not build caffe tests."
 # Feel free to disable the tests if you're in a hurry, but they can still be
 # very usueful in figuring out if there's something that's misconfigured.
-run_gpu make runtest -j4  || fail "Caffe tests failed."
+#run_gpu make runtest -j4  || fail "Caffe tests failed."
 
 printf "\n\t%s\n\nBuild OK."
 
 printf "\n\t%s\n\nFetching trained MNC model..."
-if ! [[ -f "./data/mnc_model.caffemodel.h5" ]]; then
-  cd ${WORKDIR}/MNC
+cd ${WORKDIR}/MNC
+if ! [[ -f "./data/mnc_model/mnc_model.caffemodel.h5" ]]; then
   ./data/scripts/fetch_mnc_model.sh || fail "Could not download pretrained model."
 else
   echo "Model was already downloaded."

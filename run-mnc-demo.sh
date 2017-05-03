@@ -12,7 +12,7 @@ function run_gpu {
   srun -N 1 --gres=gpu:1 "$@"
 }
 
-CUDA_VERSION="8.0.44"
+CUDA_VERSION="8.0.27"   # 8.0.44 causes weird Qt conflicts.
 WORKDIR=~/work
 
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
