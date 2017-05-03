@@ -15,7 +15,7 @@ function run_gpu {
 # Enable module support.
 source /etc/profile
 
-CUDA_VERSION="8.0.27"
+CUDA_VERSION="8.0.27"   # 8.0.44 causes weird Qt conflicts.
 WORKDIR=~/work
 
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
