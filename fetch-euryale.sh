@@ -34,7 +34,8 @@ fi
 # This is where we will be putting our segmentation result.
 mkdir -p "${KITTI_ROOT}/seg_image_02/mnc"
 
-rsync -a "${EURYALE_HOST}:${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/seg_image_02/" \
+rsync -a --info=progress2 \
+  "${EURYALE_HOST}:${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/seg_image_02/" \
   "${KITTI_ROOT}/seg_image_02"
 
 echo "Fetched segmentation result from Euryale host: ${EURYALE_HOST}."
