@@ -19,12 +19,13 @@ REMOTE_KITTI_DIR="${EUR_PROJECT_DIR}/kitti/"
 
 # TODO Arg should be a kitti dir.
 
-if [[ "$#" -ne 1 ]]; then
-  echo >&2 "Usage: $0 <kitti_sequence_root>"
+if [[ "$#" -lt 1 ]]; then
+  echo >&2 "Usage: $0 <kitti_sequence_root> <job args>"
   exit 1
 fi
 
 KITTI_ROOT="$1"
+shift
 KITTI_ROOT="${KITTI_ROOT%/}"      # Removes trailing slashes
 KITTI_FOLDER="${KITTI_ROOT##*/}"
 
@@ -52,22 +53,26 @@ rsync -a "${KITTI_ROOT}" "${EURYALE_HOST}:${REMOTE_KITTI_DIR}" || {
 # TODO(andrei): Don't sync the 'git' directory.
 ssh "$EURYALE_HOST" mkdir -p work/setup
 rsync -a "$(pwd -P)/" "${EURYALE_HOST}:work/setup" || {
-  fail "Could not rsync code."
+  fail "Could not rsync Bash helper scripts."
+}
+
+# Sync the Python tools part of the MNC code.
+rsync -a $(pwd -P)/../MNC/tools/*.py "${EURYALE_HOST}:work/MNC/tools/" || {
+  fail "Could not rsync Python tools (tools)."
+}
+rsync -a $(pwd -P)/../MNC/lib/**/*.py "${EURYALE_HOST}:work/MNC/tools/" || {
+  fail "Could not rsync Python tools (lib)."
 }
 
 echo "rsynced data and code OK."
 
-ssh "$EURYALE_HOST" '~/work/setup/run-mnc-demo-batch.sh' \
-  --input "${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/image_02/data" \
-  --output "${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/seg_image_02/mnc" || {
-  fail "Could not kick off batch job."
-}
+#ssh "$EURYALE_HOST" '~/work/setup/run-mnc-demo-batch.sh' \
+  #--input "${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/image_02/data" \
+  #--output "${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/seg_image_02/mnc" || {
+  #fail "Could not kick off batch job."
+#}
+ssh "$EURYALE_HOST" -Y '~/work/setup/run-mnc-demo.sh' \
+  --input '~/work/MNC/data/demo' --output '~/work/MNC/data/demo/output' "$@"
 
 echo "Batch job launched OK."
-
-# TODO(andrei): Job to fetch stuff back. Print copypasta-friendly code here, or
-# just srun the tool since we're always in tmux anyway.
-
-#rsync -a "${EURYALE_HOST}:${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/seg_image_02/" \
-  #"${KITTI_ROOT}/seg_image_02"
 
