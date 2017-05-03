@@ -43,7 +43,7 @@ mkdir -p "${KITTI_ROOT}/seg_image_02/mnc"
 
 # Sync data to Euryale folder
 ssh "$EURYALE_HOST" mkdir -p "$REMOTE_KITTI_DIR"
-rsync -a "${KITTI_ROOT}" "${EURYALE_HOST}:${REMOTE_KITTI_DIR}" || {
+rsync -a --info=progress2 "${KITTI_ROOT}" "${EURYALE_HOST}:${REMOTE_KITTI_DIR}" || {
   fail "Could not rsync KITTI data."
 }
 
