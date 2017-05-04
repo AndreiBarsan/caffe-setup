@@ -66,13 +66,13 @@ rsync -a $(pwd -P)/../MNC/lib/**/*.py "${EURYALE_HOST}:work/MNC/tools/" || {
 
 echo "rsynced data and code OK."
 
-#ssh "$EURYALE_HOST" '~/work/setup/run-mnc-demo-batch.sh' \
-  #--input "${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/image_02/data" \
-  #--output "${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/seg_image_02/mnc" || {
-  #fail "Could not kick off batch job."
-#}
-ssh "$EURYALE_HOST" -Y '~/work/setup/run-mnc-demo.sh' \
-  --input '~/work/MNC/data/demo' --output '~/work/MNC/data/demo/output' "$@"
+ssh "$EURYALE_HOST" '~/work/setup/run-mnc-demo-batch.sh' \
+  --input "${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/image_02/data" \
+  --output "${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/seg_image_02/mnc" || {
+  fail "Could not kick off batch job."
+}
+#ssh "$EURYALE_HOST" -Y '~/work/setup/run-mnc-demo.sh' \
+  #--input '~/work/MNC/data/demo' --output '~/work/MNC/data/demo/output' "$@"
 
 echo "Batch job launched OK."
 

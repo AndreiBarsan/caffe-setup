@@ -35,8 +35,9 @@ source activate mnc
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/site/opt/cuda/7.5.18/x64/lib64"
 echo "Setup OK. srun-ing MNC demo..."
 
-echo "MAJOR HACK: REMOVE THIS IN THE FUTURE!!! Manually setting SLURM_JOB_ID."
-export SLURM_JOB_ID=1927
+# TODO(andrei): Support setting this via command line args when you have an
+# allocation.
+#export SLURM_JOB_ID=1927
 
 cd ${WORKDIR}/MNC
 run_gpu tools/demo.py "$@"

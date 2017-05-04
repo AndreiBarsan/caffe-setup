@@ -41,7 +41,7 @@ echo
 echo "Setting up modules and miniconda..."
 
 # TODO(andrei): Common config with CUDA/cuDNN/openCV versions.
-CUDA_VERSION="8.0.44"
+CUDA_VERSION="8.0.27"
 WORKDIR=~/work
 
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
