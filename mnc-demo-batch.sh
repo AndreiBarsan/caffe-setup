@@ -19,8 +19,8 @@ function fail {
   exit $LAST_ERR
 }
 
-tstamp="`date '+%D %T'`"
-hn="`hostname -f`"
+tstamp="$(date '+%D %T')"
+hn="$(hostname -f)"
 jobid=${SLURM_JOB_ID}
 jobname=${SLURM_JOB_NAME}
 if [ -z "${jobid}" ] ; then
@@ -45,7 +45,7 @@ CUDA_VERSION="8.0.27"
 WORKDIR=~/work
 
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
-module load cudnn/v4                || fail 'Could not load CUDNN module (v4).'
+module load cudnn/v5                || fail 'Could not load CUDNN module (v4).'
 module load opencv/3.1.0            || fail 'Could not load OpenCV module (v3.1.0)'
 module load boost/1.62.0            || fail 'Could not load boost module (v1.62.0).'
 module load mpich                   || fail 'Could not load mpi module.'
