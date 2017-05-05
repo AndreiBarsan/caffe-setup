@@ -14,32 +14,38 @@ EURYALE_HOST="euryale"
 #EURYALE_HOST="en02"
 
 EUR_PROJECT_DIR="/import/euryale/projects/BARSANA.MSC.PROJECT"
-#REMOTE_KITTI_DIR="${EUR_PROJECT_DIR}/kitti/"
-REMOTE_KITTI_DIR="${EUR_PROJECT_DIR}/cityscapes/"
+DATASET="kitti"
+REMOTE_KITTI_DIR="${EUR_PROJECT_DIR}/${DATASET}/"
 
 if [[ "$#" -ne 1 ]]; then
   echo >&2 "Usage: $0 <kitti_sequence_root>"
   exit 1
 fi
 
-KITTI_ROOT="$1"
-KITTI_ROOT="${KITTI_ROOT%/}"      # Removes trailing slashes
-KITTI_FOLDER="${KITTI_ROOT##*/}"
+SEQUENCE_ROOT="$1"
+SEQUENCE_ROOT="${SEQUENCE_ROOT%/}"      # Removes trailing slashes
+SEQUENCE_FOLDER="${SEQUENCE_ROOT##*/}"
 
-# Quick and dirty sanity check.
-#if ! [[ -d "${KITTI_ROOT}/image_00" ]]; then
-  #echo >&2 "The folder ${KITTI_ROOT} does not look like a KITTI dataset folder."
-  #ls "${KITTI_ROOT}"
-  #exit 2
-#fiseg_image_02
+# Quick sanity check for KITTI folders.
+if [[ "$DATASET" == "kitti" ]]; then
+  if ! [[ -d "${SEQUENCE_ROOT}/image_00" ]]; then
+    echo >&2 "The folder ${SEQUENCE_ROOT} does not look like a KITTI dataset folder."
+    ls "${SEQUENCE_ROOT}"
+    exit 2
+  fi
+fi
 
-#SEG_OUTPUT_SUBFOLDER=seg_image_02/mnc
-SEG_OUTPUT_SUBFOLDER=seg/mnc
-
+if [[ "$DATASET" == "kitti" ]]; then
+  SEG_OUTPUT_SUBFOLDER=seg_image_02/mnc
+elif [[ "$DATASET" == "cityscapes" ]]; then
+  SEG_OUTPUT_SUBFOLDER=seg/mnc
+else
+  fail "Unknown dataset name: ${DATASET}"
+fi
 
 rsync -a --info=progress2 \
-  "${EURYALE_HOST}:${REMOTE_KITTI_DIR}/${KITTI_FOLDER}/${SEG_OUTPUT_SUBFOLDER}/" \
-  "${KITTI_ROOT}/${SEG_OUTPUT_SUBFOLDER}"
+  "${EURYALE_HOST}:${REMOTE_KITTI_DIR}/${SEQUENCE_FOLDER}/${SEG_OUTPUT_SUBFOLDER}/" \
+  "${SEQUENCE_ROOT}/${SEG_OUTPUT_SUBFOLDER}"
 
 echo "Fetched segmentation result from Euryale host: ${EURYALE_HOST}."
 

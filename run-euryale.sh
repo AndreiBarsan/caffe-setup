@@ -33,7 +33,7 @@ shift
 SEQUENCE_ROOT="${SEQUENCE_ROOT%/}"      # Removes trailing slashes
 SEQUENCE_FOLDER="${SEQUENCE_ROOT##*/}"
 
-if [[ "${DATASET}" -eq "kitti" ]]; then
+if [[ "${DATASET}" == "kitti" ]]; then
   # Quick sanity check for KITTI folders.
   if ! [[ -d "${SEQUENCE_ROOT}/image_00" ]]; then
     echo >&2 "The folder ${SEQUENCE_ROOT} does not look like a KITTI dataset folder."
@@ -47,10 +47,10 @@ echo "Will use ${DATASET} sequence from folder: ${SEQUENCE_ROOT}"
 echo "${DATASET} folder name: ${SEQUENCE_FOLDER}"
 
 # This is where we will be putting our segmentation result.
-if [[ "$DATASET" -eq "kitti" ]]; then
+if [[ "$DATASET" == "kitti" ]]; then
   INPUT_SUBFOLDER="image_02/data"
   SEG_OUTPUT_SUBFOLDER=seg_image_02/mnc
-elif [[ "$DATASET" -eq "cityscapes" ]]; then
+elif [[ "$DATASET" == "cityscapes" ]]; then
   INPUT_SUBFOLDER=""
   SEG_OUTPUT_SUBFOLDER=seg/mnc
 else
