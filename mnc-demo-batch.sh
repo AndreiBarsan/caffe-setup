@@ -63,11 +63,13 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/site/opt/cuda/7.5.18/x64/lib64"
 
 echo "Setup OK. srun-ing MNC demo..."
 
-cd ${WORKDIR}/MNC
+cd "${WORKDIR}/MNC"
+dt="$(date '+%s')"
 
-dt="`date '+%s'`"
-# This is where the magic happens.
+# This is where the useful stuff actually happens.
 srun tools/demo.py "$@" 2>&1
+
+# We're done. Report some misc info and exit.
 stat="$?"
 dt=$(( `date '+%s'` - ${dt} ))
 echo "Job finished. Status=$stat, duration=$dt second(s)."
