@@ -6,6 +6,9 @@
 #
 # Loosely based on the guide from:
 # https://autchen.github.io/guides/2015/04/03/caffe-install.html
+#
+# TODO(andrei): Use salloc or make this into a batch job, so you can run this
+# whole setup as a single job on Euryale.
 
 
 ################################################################################
@@ -44,14 +47,15 @@ echo "Setting up MNC Caffe for the local user (experimental support)..."
 
 # Brotip: The Euryale Titan X cards are the Pascal version. CUDA 7.5 does NOT
 # support them!
-CUDA_VERSION="8.0.44"
+CUDA_VERSION="8.0.27"
 # CUDA_VERSION="7.5.18"
 
 MODULE_CUDA_DIR="/site/opt/cuda/${CUDA_VERSION}/x64"
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
 # As of May 2017, Caffe (or at least the version used with MTN) does NOT
 # support cuDNN 5 or higher, and cuDNN 4 leads to errors, so it's disabled.
-#module load cudnn/v5.1              || fail 'Could not load cuDNN module.'
+# TODO(andrei): Remove this if merge added support for cuDNN.
+module load cudnn/v5.1              || fail 'Could not load cuDNN module.'
 module load opencv/3.1.0            || fail 'Could not load OpenCV module (v3.1.0)'
 # Fun fact: Boost 1.60 had a bug preventing it from being used to compile Caffe.
 module load boost/1.62.0            || fail 'Could not load boost module (v1.62.0).'
@@ -305,7 +309,7 @@ run_gpu make pycaffe -j8  || fail "Could not build pycaffe."
 run_gpu make test -j8     || fail "Could not build caffe tests."
 # Feel free to disable the tests if you're in a hurry, but they can still be
 # very usueful in figuring out if there's something that's misconfigured.
-#run_gpu make runtest -j4  || fail "Caffe tests failed."
+run_gpu make runtest -j4  || fail "Caffe tests failed."
 
 printf "\n\t%s\n\nBuild OK."
 

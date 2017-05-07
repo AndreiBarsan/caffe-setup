@@ -19,8 +19,8 @@ function fail {
   exit $LAST_ERR
 }
 
-tstamp="`date '+%D %T'`"
-hn="`hostname -f`"
+tstamp="$(date '+%D %T')"
+hn="$(hostname -f)"
 jobid=${SLURM_JOB_ID}
 jobname=${SLURM_JOB_NAME}
 if [ -z "${jobid}" ] ; then
@@ -41,11 +41,11 @@ echo
 echo "Setting up modules and miniconda..."
 
 # TODO(andrei): Common config with CUDA/cuDNN/openCV versions.
-CUDA_VERSION="8.0.44"
+CUDA_VERSION="8.0.27"
 WORKDIR=~/work
 
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
-module load cudnn/v4                || fail 'Could not load CUDNN module (v4).'
+module load cudnn/v5                || fail 'Could not load CUDNN module (v4).'
 module load opencv/3.1.0            || fail 'Could not load OpenCV module (v3.1.0)'
 module load boost/1.62.0            || fail 'Could not load boost module (v1.62.0).'
 module load mpich                   || fail 'Could not load mpi module.'
@@ -63,11 +63,13 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/site/opt/cuda/7.5.18/x64/lib64"
 
 echo "Setup OK. srun-ing MNC demo..."
 
-cd ${WORKDIR}/MNC
+cd "${WORKDIR}/MNC"
+dt="$(date '+%s')"
 
-dt="`date '+%s'`"
-# This is where the magic happens.
+# This is where the useful stuff actually happens.
 srun tools/demo.py "$@" 2>&1
+
+# We're done. Report some misc info and exit.
 stat="$?"
 dt=$(( `date '+%s'` - ${dt} ))
 echo "Job finished. Status=$stat, duration=$dt second(s)."
