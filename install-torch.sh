@@ -96,19 +96,21 @@ echo "SCRIPT_OUT:Install dir is ${INSTALL_DIR}"
 # INSTALL_DIR added to PATH and LD_LIBRARY_PATH in .bashrc
 
 CMAKE_VERSION="$(cmake --version)"
-if [[ "$CMAKE_VERSION" =~ '3.' ]]; then
-  echo "SCRIPT_OUT:CMake Version Ok"
-else
-  echo "SCRIPT_OUT:Installing CMake 3.7 locally"
-  wget https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
-  tar -xvzf cmake-3.7.2.tar.gz
-  cd cmake-3.7.2
-  ./bootstrap --prefix="${INSTALL_DIR}"
-  make -j4
-  make check -j4
-  make install
-  echo "SCRIPT_OUT:CMake installed"
-fi
+echo "SCRIPT_OUT:Cmake version is " $CMAKE_VERSION " minimum is 2.8 in CMakeLists.txt"
+# Unloaded gcc 4.8 does not have GLIBCXX_3.4.20, required by cmake 3.7, see strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
+#if [[ "$CMAKE_VERSION" =~ '3.' ]]; then
+#  echo "SCRIPT_OUT:CMake Version Ok"
+#else
+#  echo "SCRIPT_OUT:Installing CMake 3.7 locally"
+#  wget https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
+#  tar -xvzf cmake-3.7.2.tar.gz
+#  cd cmake-3.7.2
+#  ./bootstrap --prefix="${INSTALL_DIR}"
+#  make -j4
+#  make check -j4
+#  make install
+#  echo "SCRIPT_OUT:CMake installed"
+#fi
 
 ################################################################################
 # Install Torch dependencies and Torch distro
