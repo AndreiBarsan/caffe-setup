@@ -19,7 +19,7 @@
 
 function fail {
   LAST_ERR="$?"
-  echo >&2 "Failed to set up Torch: $1"
+  echo >&2 "Failed to set up Tensorflow: $1"
   exit $LAST_ERR
 }
 
@@ -97,8 +97,8 @@ INSTALL_DIR="/import/euryale/projects/shekhars"
 if ! [[ -d "${INSTALL_DIR}/miniconda" ]]; then
   echo "Setting up miniconda in" $INSTALL_DIR
   cd "$(mktemp -d)"
-  run_gpu wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  run_gpu bash miniconda.sh -b -p "${INSTALL_DIR}/miniconda" || fail 'Could not install anaconda'
+  wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  bash miniconda.sh -b -p "${INSTALL_DIR}/miniconda" || fail 'Could not install anaconda'
   ln -s $INSTALL_DIR/miniconda $HOME/miniconda
   export PATH="${HOME}/miniconda/bin:${PATH}"
   conda create -y --quiet --name tensorflow python=3.4
@@ -114,13 +114,13 @@ fi
 source activate tensorflow
 
 PIP_VERSION="$(which pip)"
-if [[ "$PIP_VERSION" =~ 'anaconda' ]]; then
+if [[ "$PIP_VERSION" =~ 'miniconda' ]]; then
   echo "SCRIPT_OUT:pip is from anaconda"
-  run_gpu pip install --ignore-installed --upgrade \
+  pip install --ignore-installed --upgrade \
     https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.1.0-cp34-cp34m-linux_x86_64.whl || fail 'conda could not install tensorflow'
 else
   echo "SCRIPT_OUT:pip not from anaconda, aborting"
   fail 'pip not from anaconda, check path and stuff'
 fi
 
-run_gpu python3 -c 'import tensorflow as tf' || fail 'Could not import tensorflow, cry '
+python3 -c 'import tensorflow as tf' || fail 'Could not import tensorflow, cry '
