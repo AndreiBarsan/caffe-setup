@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# demo job to test the pbig partition
-#   job name is big hello (yeah, big job,small result as usual)
+# Job to install torch7 distro in local folder
+#     assumes local packages are in ~/user/...
 # 
 #SBATCH --job-name="torch-install"
 #SBATCH --output=torch-install.out
@@ -11,7 +11,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=7
 #SBATCH --mem-per-cpu=2048
-#
+#SBATCH --gres=gpu:1
 
 ################################################################################
 # Helpers and Miscellaneous
@@ -72,8 +72,6 @@ CUDA_VERSION="8.0.44"
 
 MODULE_CUDA_DIR="/site/opt/cuda/${CUDA_VERSION}/x64"
 module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
-# As of May 2017, Caffe (or at least the version used with MTN) does NOT
-# support cuDNN 5 or higher, and cuDNN 4 leads to errors, so it's disabled.
 module load cudnn/v5.1              || fail 'Could not load cuDNN module.'
 #module load opencv/3.1.0            || fail 'Could not load OpenCV module (v3.1.0)'
 # Fun fact: Boost 1.60 had a bug preventing it from being used to compile Caffe.
@@ -81,10 +79,10 @@ module load boost/1.62.0            || fail 'Could not load boost module (v1.62.
 module load mpich                   || fail 'Could not load mpi module.'
 module load openmpi                 || fail 'Could not load openmpi.'
 
-# added to remove /usr/lib/x86_64-linux-gnu/libgomp.so.1: version `GOMP_4.0' not found (required by /home/shekhars/torch/install/lib/libTH.so.0) on -llibtorch
 # default load is gcc 4.9, but we need the same version as libgomp.so.1 
+#   because libtorch (libTH.so) needs GOMP_4.0 which for some reason does not change
+#   on module load gcc, while it should be of the same version as gcc
 module unload gcc                   || fail 'Could not load gcc'
-# module load gcc                   || fail 'Could not load gcc'
 
 echo "SCRIPT_OUT:Relevant modules loaded OK."
 
@@ -97,7 +95,8 @@ echo "SCRIPT_OUT:Install dir is ${INSTALL_DIR}"
 
 CMAKE_VERSION="$(cmake --version)"
 echo "SCRIPT_OUT:Cmake version is " $CMAKE_VERSION " minimum is 2.8 in CMakeLists.txt"
-# Unloaded gcc 4.8 does not have GLIBCXX_3.4.20, required by cmake 3.7, see strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
+# Default gcc 4.8 does not have GLIBCXX_3.4.20, required by cmake 3.7, 
+#   see strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
 #if [[ "$CMAKE_VERSION" =~ '3.' ]]; then
 #  echo "SCRIPT_OUT:CMake Version Ok"
 #else
