@@ -11,8 +11,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "${SCRIPT_DIR}/util.sh.inc"
 
-export SLURM_JOB_ID=2166
-echo >&2 "Using hardcoded SLURM_JOB_ID=$SLURM_JOB_ID. Be careful!"
+export SLURM_JOB_ID=2194
+printf >&2 "\n\n\t\n" "!!! Using hardcoded SLURM_JOB_ID=$SLURM_JOB_ID. Be careful!"
 
 ################################################################################
 # Basic Setup
@@ -23,9 +23,7 @@ echo "Setting up Caffe prerequisites for the local user (experimental support)..
 # Load appropriate modules.
 # If executing remotely, make sure you source the appropriate system-level
 # configs in order to expose the 'module' command.
-
 source setup-modules.sh.inc
-
 echo "Relevant modules loaded OK."
 
 # This is the directory where we will be downloading and building stuff.
@@ -101,19 +99,21 @@ printf "\n\t%s\n\n" "Starting main Caffe build."
 
 # Mini hack to get OpenCV work even though it expects CUDA 7.5. Caffe itself
 # will use CUDA 8, but OpenCV won't complain either.
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/site/opt/cuda/7.5.18/x64/lib64"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/site/opt/cuda/7.0.28/x64/lib64"
 run_gpu make all -j8      || fail "Could not build caffe."
-#run_gpu make pycaffe -j8  || fail "Could not build pycaffe."
 run_gpu make test -j8     || fail "Could not build caffe tests."
 run_gpu make tools -j8    || fail "Could not build caffe tools"
 # Feel free to disable the tests if you're in a hurry, but they can still be
 # very usueful in figuring out if there's something that's misconfigured.
-run_gpu make runtest -j4  || fail "Caffe tests failed."
+#run_gpu make runtest      || fail "Caffe tests failed."
 
 printf "\n\t%s\n\nBuild OK."
 
-# TODO(andrei): See DISPNET-README.md. Should be able to run ./demo.py
-# left_list.txt, right_list.txt.
+
+cd models/DispNet
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/site/opt/cuda/7.5.18/x64/lib64"
+run_gpu ./demo.py imgL_list.txt imgR_list.txt
+
 
 #printf "\n\t%s\n\nFetching trained MNC model..."
 #cd ${WORKDIR}/MNC

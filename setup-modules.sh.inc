@@ -10,7 +10,7 @@ module load cuda/"${CUDA_VERSION}"  || fail 'Could not load CUDA module.'
 # support cuDNN 5 or higher, and cuDNN 4 leads to errors, so it's disabled.
 # TODO(andrei): Remove this if merge added support for cuDNN.
 module load cudnn/v5.1              || fail 'Could not load cuDNN module.'
-module load opencv/3.1.0            || fail 'Could not load OpenCV module (v3.1.0)'
+module load opencv/2.4.11           || fail 'Could not load OpenCV module.'
 # Fun fact: Boost 1.60 had a bug preventing it from being used to compile Caffe.
 module load boost/1.62.0            || fail 'Could not load boost module (v1.62.0).'
 module load mpich                   || fail 'Could not load mpi module.'
