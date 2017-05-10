@@ -18,8 +18,9 @@ EURYALE_HOST="euryale"
 EUR_PROJECT_DIR="/import/euryale/projects/BARSANA.MSC.PROJECT"
 
 # The dataset the sequence we're processing is part of.
-# Currently supported are 'kitti' and 'cityscapes'.
-DATASET="kitti"
+# Currently supported are 'kitti', 'kitti-odometry' and 'cityscapes'.
+#DATASET="kitti"
+DATASET="kitti-odometry"
 
 REMOTE_DIR="${EUR_PROJECT_DIR}/${DATASET}/"
 
@@ -50,6 +51,9 @@ echo "${DATASET} folder name: ${SEQUENCE_FOLDER}"
 if [[ "$DATASET" == "kitti" ]]; then
   INPUT_SUBFOLDER="image_02/data"
   SEG_OUTPUT_SUBFOLDER=seg_image_02/mnc
+elif [[ "$DATASET" == "kitti-odometry" ]]; then
+  INPUT_SUBFOLDER="image_2"
+  SEG_OUTPUT_SUBFOLDER=seg_image_2/mnc
 elif [[ "$DATASET" == "cityscapes" ]]; then
   INPUT_SUBFOLDER=""
   SEG_OUTPUT_SUBFOLDER=seg/mnc

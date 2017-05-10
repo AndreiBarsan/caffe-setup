@@ -14,7 +14,7 @@ EURYALE_HOST="euryale"
 #EURYALE_HOST="en02"
 
 EUR_PROJECT_DIR="/import/euryale/projects/BARSANA.MSC.PROJECT"
-DATASET="kitti"
+DATASET="kitti-odometry"
 REMOTE_KITTI_DIR="${EUR_PROJECT_DIR}/${DATASET}/"
 
 if [[ "$#" -ne 1 ]]; then
@@ -37,6 +37,8 @@ fi
 
 if [[ "$DATASET" == "kitti" ]]; then
   SEG_OUTPUT_SUBFOLDER=seg_image_02/mnc
+elif [[ "$DATASET" == "kitti-odometry" ]]; then
+  SEG_OUTPUT_SUBFOLDER=seg_image_2/mnc
 elif [[ "$DATASET" == "cityscapes" ]]; then
   SEG_OUTPUT_SUBFOLDER=seg/mnc
 else

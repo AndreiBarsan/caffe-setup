@@ -3,7 +3,8 @@
 # Directory where this script is located.
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-SBATCH_FLAGS="--nodelist=node03"
+#SBATCH_FLAGS="--nodelist=node03"
+SBATCH_FLAGS=""
 
 # Enable module support.
 source /etc/profile || {
