@@ -9,7 +9,9 @@ function fail {
 }
 
 function run_gpu {
-  srun -N 1 --gres=gpu:1 "$@"
+  #srun -N 1 --gres=gpu:1 "$@"
+  echo "Running stuff on local machine, NOT via srun ($(hostname))!!!"
+  eval "$@"
 }
 
 # Enable module support.

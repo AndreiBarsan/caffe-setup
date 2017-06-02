@@ -14,7 +14,8 @@ function fail {
 
 
 MNC_EURYALE_PATH="work/MNC"
-EURYALE_HOST="euryale"
+#EURYALE_HOST="euryale"
+EURYALE_HOST="en01"
 EUR_PROJECT_DIR="/import/euryale/projects/BARSANA.MSC.PROJECT"
 
 # The dataset the sequence we're processing is part of.
@@ -82,7 +83,7 @@ rsync -a "$(pwd -P)/" "${EURYALE_HOST}:work/setup" || {
 rsync -a $(pwd -P)/../MNC/tools/*.py "${EURYALE_HOST}:work/MNC/tools/" || {
   fail "Could not rsync Python tools (tools)."
 }
-rsync -a $(pwd -P)/../MNC/lib/**/*.py "${EURYALE_HOST}:work/MNC/tools/" || {
+rsync -a $(pwd -P)/../MNC/lib/ "${EURYALE_HOST}:work/MNC/lib/" || {
   fail "Could not rsync Python tools (lib)."
 }
 
@@ -95,6 +96,11 @@ ssh "$EURYALE_HOST" '~/work/setup/run-mnc-demo-batch.sh' \
 }
 
 # This can be used for debugging.
+#ssh en04 '~/work/setup/run-mnc-demo.sh' \
+  #--input "${REMOTE_DIR}/${SEQUENCE_FOLDER}/${INPUT_SUBFOLDER}" \
+  #--output "${REMOTE_DIR}/${SEQUENCE_FOLDER}/${SEG_OUTPUT_SUBFOLDER}" "$@" || {
+  #fail "Could not kick off batch job."
+#}
 #ssh "$EURYALE_HOST" -Y '~/work/setup/run-mnc-demo.sh' \
   #--input '~/work/MNC/data/demo' --output '~/work/MNC/data/demo/output' "$@"
 

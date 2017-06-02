@@ -2,6 +2,7 @@
 # Utility for running the MNC demo on ETHZ's Euryale mini-cluster as a Slurm
 # batch job.
 #
+#
 #SBATCH --job-name="mnc-inference"
 #SBATCH --output="mnc-inference-%6j.log"
 #
