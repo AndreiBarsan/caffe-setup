@@ -3,15 +3,6 @@
 # batch job.
 #
 #
-#SBATCH --job-name="mnc-inference"
-#SBATCH --output="mnc-inference-%6j.log"
-#
-# Note: could use 'plongx' if we want longer jobs and have the privileges to do
-# so.
-#SBATCH --partition=pdefault
-#SBATCH --time=02:00:00
-#SBATCH --nodes=1
-#SBATCH --gres=gpu:1
 
 
 function fail {

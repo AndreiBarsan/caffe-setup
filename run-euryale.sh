@@ -19,14 +19,16 @@ EURYALE_HOST="en01"
 EUR_PROJECT_DIR="/import/euryale/projects/BARSANA.MSC.PROJECT"
 
 # The dataset the sequence we're processing is part of.
-# Currently supported are 'kitti', 'kitti-odometry' and 'cityscapes'.
+# Currently supported are 'kitti', 'kitti-odometry', 'kitti-tracking' and 'cityscapes'.
+#DATASET="cityscapes
 #DATASET="kitti"
-DATASET="kitti-odometry"
+#DATASET="kitti-odometry"
+DATASET="kitti-tracking"
 
 REMOTE_DIR="${EUR_PROJECT_DIR}/${DATASET}/"
 
 if [[ "$#" -lt 1 ]]; then
-  echo >&2 "Usage: $0 <video_sequence_root> <job args>"
+  echo >&2 "Usage: $0 <video_sequence_root> <kitti-tracking-id> <job args>"
   exit 1
 fi
 
@@ -51,13 +53,22 @@ echo "${DATASET} folder name: ${SEQUENCE_FOLDER}"
 # This is where we will be putting our segmentation result.
 if [[ "$DATASET" == "kitti" ]]; then
   INPUT_SUBFOLDER="image_02/data"
-  SEG_OUTPUT_SUBFOLDER=seg_image_02/mnc
+  SEG_OUTPUT_SUBFOLDER="seg_image_02/mnc"
 elif [[ "$DATASET" == "kitti-odometry" ]]; then
   INPUT_SUBFOLDER="image_2"
-  SEG_OUTPUT_SUBFOLDER=seg_image_2/mnc
+  SEG_OUTPUT_SUBFOLDER="seg_image_2/mnc"
 elif [[ "$DATASET" == "cityscapes" ]]; then
   INPUT_SUBFOLDER=""
-  SEG_OUTPUT_SUBFOLDER=seg/mnc
+  SEG_OUTPUT_SUBFOLDER="seg/mnc"
+elif [[ "$DATASET" == "kitti-tracking" ]]; then
+  # Normal datasets are "root/<ID>/img_type/<imgs>".
+  # KITT tracking sequences are "root/img_foo/<ID>/<imgs>", so we need to do
+  # a bit of hacking.
+  KT_ID="$1"
+  shift
+  echo "Will process 'kitti-tracking' sequence with ID #${KT_ID}."
+  INPUT_SUBFOLDER="training/image_02/$(printf '%04d' ${KT_ID})"
+  SEG_OUTPUT_SUBFOLDER="training/seg_image_02/$(printf '%04d' ${KT_ID})/mnc"
 else
   fail "Unknown dataset name: ${DATASET}"
 fi
@@ -67,9 +78,9 @@ mkdir -p "${SEQUENCE_ROOT}/${SEG_OUTPUT_SUBFOLDER}"
 
 # Sync data to Euryale folder
 ssh "$EURYALE_HOST" mkdir -p "$REMOTE_DIR"
-rsync -a --info=progress2 "${SEQUENCE_ROOT}" "${EURYALE_HOST}:${REMOTE_DIR}" || {
-  fail "Could not rsync data."
-}
+#rsync -a --info=progress2 "${SEQUENCE_ROOT}" "${EURYALE_HOST}:${REMOTE_DIR}" || {
+  #fail "Could not rsync data."
+#}
 
 # Sync our setup code (but NOT the actual MNC stuff; that's assumed to already
 # be available). See './setup-mnc.sh' for more information.

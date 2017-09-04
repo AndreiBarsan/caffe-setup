@@ -14,11 +14,13 @@ EURYALE_HOST="euryale"
 #EURYALE_HOST="en02"
 
 EUR_PROJECT_DIR="/import/euryale/projects/BARSANA.MSC.PROJECT"
-DATASET="kitti-odometry"
+#DATASET="kitti-odometry"
+#DATASET="kitti"
+DATASET="kitti-tracking"
 REMOTE_KITTI_DIR="${EUR_PROJECT_DIR}/${DATASET}/"
 
-if [[ "$#" -ne 1 ]]; then
-  echo >&2 "Usage: $0 <kitti_sequence_root>"
+if [[ "$#" -ne 1 && "$#" -ne 2 ]]; then
+  echo >&2 "Usage: $0 <kitti_sequence_root> <tracking_sequence_id>"
   exit 1
 fi
 
@@ -41,6 +43,11 @@ elif [[ "$DATASET" == "kitti-odometry" ]]; then
   SEG_OUTPUT_SUBFOLDER=seg_image_2/mnc
 elif [[ "$DATASET" == "cityscapes" ]]; then
   SEG_OUTPUT_SUBFOLDER=seg/mnc
+elif [[ "$DATASET" == "kitti-tracking" ]]; then
+  KT_ID="$2"
+  shift
+  echo "Will process 'kitti-tracking' sequence with ID #${KT_ID}."
+  SEG_OUTPUT_SUBFOLDER="training/seg_image_02/$(printf '%04d' ${KT_ID})/mnc"
 else
   fail "Unknown dataset name: ${DATASET}"
 fi

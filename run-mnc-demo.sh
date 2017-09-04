@@ -39,7 +39,7 @@ echo "Setup OK. srun-ing MNC demo..."
 
 # TODO(andrei): Support setting this via command line args when you have an
 # allocation.
-#export SLURM_JOB_ID=1927
+export SLURM_JOB_ID=5154
 
 cd ${WORKDIR}/MNC
 run_gpu tools/demo.py "$@"
